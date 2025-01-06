@@ -6,7 +6,7 @@ Escriba el codigo que ejecute la accion solicitada en cada pregunta.
 """
 
 
-def pregunta_01():
+def pregunta_02():
     """
     La información requerida para este laboratio esta almacenada en el
     archivo "files/input.zip" ubicado en la carpeta raíz.
@@ -71,3 +71,59 @@ def pregunta_01():
 
 
     """
+import os
+import zipfile
+import csv
+
+def pregunta_01():
+    # Rutas de los archivos
+    zip_path = "files/input.zip"
+    input_dir = "input"
+    output_dir = "output"
+    train_csv = os.path.join(output_dir, "train_dataset.csv")
+    test_csv = os.path.join(output_dir, "test_dataset.csv")
+
+    # Crear carpeta de salida si no existe
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Descomprimir el archivo ZIP
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall()
+
+    def process_folder(folder_path, output_csv):
+        """
+        Procesa una carpeta para generar un archivo CSV.
+
+        Args:
+            folder_path (str): Ruta de la carpeta (train o test).
+            output_csv (str): Ruta del archivo CSV de salida.
+        """
+        rows = []
+
+        # Recorrer subcarpetas (negative, positive, neutral)
+        for sentiment in os.listdir(folder_path):
+            sentiment_path = os.path.join(folder_path, sentiment)
+
+            if os.path.isdir(sentiment_path):
+                for file_name in os.listdir(sentiment_path):
+                    file_path = os.path.join(sentiment_path, file_name)
+
+                    # Leer el contenido del archivo de texto
+                    with open(file_path, "r", encoding="utf-8") as file:
+                        phrase = file.read().strip()
+
+                    # Añadir fila al CSV
+                    rows.append({"phrase": phrase, "sentiment": sentiment})
+
+        # Escribir el archivo CSV
+        with open(output_csv, "w", newline="", encoding="utf-8") as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=["phrase", "sentiment"])
+            writer.writeheader()
+            writer.writerows(rows)
+
+    # Procesar las carpetas train y test
+    process_folder(os.path.join(input_dir, "train"), train_csv)
+    process_folder(os.path.join(input_dir, "test"), test_csv)
+
+# Llamar a la función
+pregunta_01()
