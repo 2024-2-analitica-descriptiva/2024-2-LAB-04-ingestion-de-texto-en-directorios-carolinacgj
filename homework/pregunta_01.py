@@ -78,8 +78,8 @@ import csv
 def pregunta_01():
     # Rutas de los archivos
     zip_path = "files/input.zip"
-    input_dir = "input"
-    output_dir = "output"
+    input_dir = "files/input"
+    output_dir = "files/output"
     train_csv = os.path.join(output_dir, "train_dataset.csv")
     test_csv = os.path.join(output_dir, "test_dataset.csv")
 
@@ -88,7 +88,7 @@ def pregunta_01():
 
     # Descomprimir el archivo ZIP
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall()
+        zip_ref.extractall("files")
 
     def process_folder(folder_path, output_csv):
         """
@@ -101,23 +101,23 @@ def pregunta_01():
         rows = []
 
         # Recorrer subcarpetas (negative, positive, neutral)
-        for sentiment in os.listdir(folder_path):
-            sentiment_path = os.path.join(folder_path, sentiment)
+        for target in os.listdir(folder_path):
+            target_path = os.path.join(folder_path, target)
 
-            if os.path.isdir(sentiment_path):
-                for file_name in os.listdir(sentiment_path):
-                    file_path = os.path.join(sentiment_path, file_name)
+            if os.path.isdir(target_path):
+                for file_name in os.listdir(target_path):
+                    file_path = os.path.join(target_path, file_name)
 
                     # Leer el contenido del archivo de texto
                     with open(file_path, "r", encoding="utf-8") as file:
                         phrase = file.read().strip()
 
                     # Añadir fila al CSV
-                    rows.append({"phrase": phrase, "sentiment": sentiment})
+                    rows.append({"phrase": phrase, "target": target})
 
         # Escribir el archivo CSV
         with open(output_csv, "w", newline="", encoding="utf-8") as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=["phrase", "sentiment"])
+            writer = csv.DictWriter(csvfile, fieldnames=["phrase", "target"])
             writer.writeheader()
             writer.writerows(rows)
 
